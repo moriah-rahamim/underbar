@@ -106,8 +106,23 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-  };
+    var noDupes = {
+      original: [],
+      iterated: []
+    };
 
+    if (!iterator) iterator = _.identity;
+    
+    _.each(array, function(item) {
+      var iteratedItem = iterator(item);
+      if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
+        noDupes.original.push(item);
+        noDupes.iterated.push(iteratedItem);
+      }
+    });
+
+    return noDupes.original;
+  };
 
   // Return the results of applying an iterator to each element.
   _.map = function(collection, iterator) {
