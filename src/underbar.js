@@ -253,7 +253,6 @@
   _.extend = function(obj) {
     var objects = Array.prototype.slice.call(arguments).slice(1);
 
-    // debugger;
     _.each(objects, function(subObj) {
       _.each(subObj, function(item, key) {
         obj[key] = item;
@@ -266,6 +265,17 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var objects = Array.prototype.slice.call(arguments).slice(1);
+
+    _.each(objects, function(subObj) {
+      _.each(subObj, function(item, key) {
+        if(obj[key] === undefined) {
+          obj[key] = item;
+        }
+      });
+    });
+
+    return obj;
   };
 
 
