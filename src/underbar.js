@@ -310,7 +310,7 @@
     };
   };
 
-  // Memorize an expensive function's results by storing them. You may assume
+  // Memoize an expensive function's results by storing them. You may assume
   // that the function only takes primitives as arguments.
   // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
   // same thing as once, but based on many sets of unique arguments.
@@ -319,6 +319,45 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+    // Returns true if equivalent
+    var sameArgs = function(args1, args2) {
+      // base cases
+      if (args1 === args2) return true;
+      if (typeof(args1) !== typeof(args2)) return false;
+      if (args1.length !== args2.length) return false;
+      
+      if (typeof(args1) === 'object' && args1 !== null) {
+        var result = true;
+        _.each(args1, function(item, key) {
+          result = result && sameArgs(args1[key], args2[key]);
+        });
+        return result;
+      }
+
+      return false;
+    }
+
+    // Return index if it finds a match of args. Else return -1
+    var argsIndex = function(arrayOfArgs, argsToFind) {
+      for (let i = 0; i < arrayOfArgs.length; i++) {
+        let currentArgs = arrayOfArgs[i];
+        if (sameArgs(currentArgs, argsToFind)) return i;
+      }
+      return -1;
+    }
+
+    var alreadyCalled = [];
+    var result = [];
+    return function() {
+      var index = argsIndex(alreadyCalled, arguments);
+      if (index === -1) {
+        index = result.length;
+        result.push(func.apply(this, arguments));
+        alreadyCalled.push(arguments);
+      }
+      return result[index];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
