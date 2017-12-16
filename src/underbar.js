@@ -327,7 +327,7 @@
       var index = alreadyCalled.indexOf(argsString);
       if (index === -1) {
         index = result.length;
-        result.push(func.apply(this, arguments));
+        result.push(func.apply(null, arguments));
         alreadyCalled.push(argsString);
       }
       return result[index];
@@ -341,6 +341,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments).slice(2);
+    window.setTimeout(function(){
+      func.apply(null, args);
+    }, wait);
   };
 
 
