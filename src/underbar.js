@@ -319,42 +319,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-
-    // Returns true if equivalent
-    var sameArgs = function(args1, args2) {
-      // base cases
-      if (args1 === args2) return true;
-      if (typeof(args1) !== typeof(args2)) return false;
-      if (args1.length !== args2.length) return false;
-      
-      if (typeof(args1) === 'object' && args1 !== null) {
-        var result = true;
-        _.each(args1, function(item, key) {
-          result = result && sameArgs(args1[key], args2[key]);
-        });
-        return result;
-      }
-
-      return false;
-    }
-
-    // Return index if it finds a match of args. Else return -1
-    var argsIndex = function(arrayOfArgs, argsToFind) {
-      for (let i = 0; i < arrayOfArgs.length; i++) {
-        let currentArgs = arrayOfArgs[i];
-        if (sameArgs(currentArgs, argsToFind)) return i;
-      }
-      return -1;
-    }
-
     var alreadyCalled = [];
     var result = [];
+
     return function() {
-      var index = argsIndex(alreadyCalled, arguments);
+      var argsString = JSON.stringify(arguments);
+      var index = alreadyCalled.indexOf(argsString);
       if (index === -1) {
         index = result.length;
         result.push(func.apply(this, arguments));
-        alreadyCalled.push(arguments);
+        alreadyCalled.push(argsString);
       }
       return result[index];
     };
