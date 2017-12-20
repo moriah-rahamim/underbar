@@ -518,5 +518,37 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+
+    var timestamp;
+    var result;
+    var timeout;
+
+    return function() {
+      var now = new Date();
+      // If at least ___ milliseconds have elapsed, apply the function
+      if (!timeout && (!timestamp || now > (timestamp + wait))) {
+
+        timestamp = now.getTime();
+        result = func.apply(null, arguments);
+        return result;
+
+      } else if (!timeout) {
+
+        timeout = true;
+        setTimeout(function() {
+          var time = new Date();
+          timestamp = time.getTime();
+          timeout = false;
+          result = func(arguments);
+          return result;
+        }, wait);
+
+      } else {
+
+        return result;
+
+      }
+    }
   };
+
 }());
