@@ -113,11 +113,22 @@
 
     if (!iterator) iterator = _.identity;
     
-    _.each(array, function(item) {
-      var iteratedItem = iterator(item);
-      if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
-        noDupes.original.push(item);
-        noDupes.iterated.push(iteratedItem);
+    _.each(array, function(item, index) {
+
+      if (isSorted){
+        if (item !== array[index-1]) {
+          var iteratedItem = iterator(item);
+          if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
+            noDupes.original.push(item);
+            noDupes.iterated.push(iteratedItem);
+          }
+        }
+      } else {
+        var iteratedItem = iterator(item);
+        if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
+          noDupes.original.push(item);
+          noDupes.iterated.push(iteratedItem);
+        }
       }
     });
 
