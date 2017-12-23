@@ -191,7 +191,7 @@
     var result = accumulator;
     var firstPass = true;
 
-    _.each(collection, function(item, index) {
+    _.each(collection, function(item) {
       if (firstPass && accumulator === undefined) {
         result = item;
         firstPass = false;
@@ -227,7 +227,6 @@
       } else {
         return false;
       }
-      return isTruthy(iterator(item));
     }, true);
   };
 
