@@ -47,7 +47,7 @@
   //
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
-  _.each = function(collection, iterator) {
+  _.each = function(collection, iterator = _.identity) {
     if (Array.isArray(collection)) {
       for (let i = 0; i < collection.length; i++) {
         iterator(collection[i], i, collection);
@@ -97,9 +97,7 @@
   };
 
   // Produce a duplicate-free version of the array.
-  _.uniq = function(array, isSorted, iterator) {
-    iterator = iterator || _.identity;
-
+  _.uniq = function(array, isSorted, iterator = _.identity) {
     let results = [];
     let alreadyFound = {}; // unique "iterated" versions of return values
 
@@ -119,7 +117,7 @@
   };
 
   // Return the results of applying an iterator to each element.
-  _.map = function(collection, iterator) {
+  _.map = function(collection, iterator = _.identity) {
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
@@ -200,10 +198,8 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+  _.every = function(collection, iterator = _.identity) {
     // TIP: Try re-using reduce() here.
-    if (!iterator) iterator = _.identity;
-
     return _.reduce(collection, function(trueSoFar, item) {
       if (trueSoFar && iterator(item)) {
         return true;
@@ -215,10 +211,8 @@
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
+  _.some = function(collection, iterator = _.identity) {
     // TIP: There's a very clever way to re-use every() here.
-    if (!iterator) iterator = _.identity;
-
     return !_.every(collection, function(item){
       return iterator(item) ? false : true;
     });
@@ -391,9 +385,7 @@
   // If iterator is a string, sort objects by that property with the name
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
-  _.sortBy = function(collection, iterator) {
-    if (!iterator) iterator = _.identity;
-
+  _.sortBy = function(collection, iterator = _.identity) {
     var originals = collection.slice();
     var altered = _.map(originals, function(item) {
       if(typeof(iterator) === 'string' || iterator instanceof String) {
