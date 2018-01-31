@@ -65,7 +65,7 @@
     // TIP: Here's an example of a function that needs to iterate, which we've
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
-    var result = -1;
+    let result = -1;
 
     _.each(array, function(item, index) {
       if (item === target && result === -1) {
@@ -78,7 +78,7 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
-    var elementsThatPass = [];
+    let elementsThatPass = [];
 
     _.each(collection, function(item) {
       if (test(item) === true) {
@@ -98,33 +98,24 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    var noDupes = {
-      original: [],
-      iterated: []
-    };
+    iterator = iterator || _.identity;
 
-    if (!iterator) iterator = _.identity;
-    
+    let results = [];
+    let alreadyFound = {}; // unique "iterated" versions of return values
+
     _.each(array, function(item, index) {
-
-      if (isSorted){
-        if (item !== array[index-1]) {
-          var iteratedItem = iterator(item);
-          if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
-            noDupes.original.push(item);
-            noDupes.iterated.push(iteratedItem);
-          }
-        }
-      } else {
-        var iteratedItem = iterator(item);
-        if (_.indexOf(noDupes.iterated, iteratedItem) === -1) {
-          noDupes.original.push(item);
-          noDupes.iterated.push(iteratedItem);
+      // if sorted, skip adjacent equivalent items
+      if (!isSorted || item !== array[index - 1]) {
+        // if iterated value is unique, add item to results and alreadyFound
+        var iteratedValue = iterator(item);
+        if (!alreadyFound[iteratedValue]) {
+          results.push(item);
+          alreadyFound[iteratedValue] = true;
         }
       }
     });
 
-    return noDupes.original;
+    return results;
   };
 
   // Return the results of applying an iterator to each element.
