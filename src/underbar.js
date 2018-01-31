@@ -105,7 +105,7 @@
       // if sorted, skip adjacent equivalent items
       if (!isSorted || item !== array[index - 1]) {
         // if iterated value is unique, add item to results and alreadyFound
-        var iteratedValue = iterator(item);
+        let iteratedValue = iterator(item);
         if (!alreadyFound[iteratedValue]) {
           results.push(item);
           alreadyFound[iteratedValue] = true;
@@ -121,11 +121,11 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
-    var results = [];
+    let results = [];
 
-    _.each(collection, function(item){
+    _.each(collection, function(item) {
       results.push(iterator(item));
-    })
+    });
 
     return results;
   };
@@ -151,26 +151,26 @@
   // Reduces an array or object to a single value by repetitively calling
   // iterator(accumulator, item) for each item. accumulator should be
   // the return value of the previous iterator call.
-  //  
+  //
   // You can pass in a starting value for the accumulator as the third argument
   // to reduce. If no starting value is passed, the first element is used as
   // the accumulator, and is never passed to the iterator. In other words, in
   // the case where a starting value is not passed, the iterator is not invoked
   // until the second element, with the first element as its second argument.
-  //  
+  //
   // Example:
   //   var numbers = [1,2,3];
   //   var sum = _.reduce(numbers, function(total, number){
   //     return total + number;
   //   }, 0); // should be 6
-  //  
+  //
   //   var identity = _.reduce([5], function(total, number){
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    var result = accumulator;
-    var firstPass = true;
+    let result = accumulator;
+    let firstPass = true;
 
     _.each(collection, function(item) {
       if (firstPass && accumulator === undefined) {
@@ -195,7 +195,6 @@
       return item === target;
     }, false);
   };
-
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator = _.identity) {
@@ -238,7 +237,7 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    var objects = Array.prototype.slice.call(arguments).slice(1);
+    let objects = Array.prototype.slice.call(arguments).slice(1);
 
     _.each(objects, function(subObj) {
       _.each(subObj, function(item, key) {
@@ -252,7 +251,7 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
-    var objects = Array.prototype.slice.call(arguments).slice(1);
+    let objects = Array.prototype.slice.call(arguments).slice(1);
 
     _.each(objects, function(subObj) {
       _.each(subObj, function(item, key) {
@@ -280,8 +279,8 @@
     // TIP: These variables are stored in a "closure scope" (worth researching),
     // so that they'll remain available to the newly-generated function every
     // time it's called.
-    var alreadyCalled = false;
-    var result;
+    let alreadyCalled = false;
+    let result;
 
     // TIP: We'll return a new function that delegates to the old one, but only
     // if it hasn't been called before.
@@ -306,18 +305,14 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var alreadyCalled = [];
-    var result = [];
+    let results = {};
 
     return function() {
-      var argsString = JSON.stringify(arguments);
-      var index = alreadyCalled.indexOf(argsString);
-      if (index === -1) {
-        index = result.length;
-        result.push(func.apply(null, arguments));
-        alreadyCalled.push(argsString);
+      let argsString = JSON.stringify(arguments);
+      if (results[argsString] === undefined) {
+        results[argsString] = func.apply(null, arguments);
       }
-      return result[index];
+      return results[argsString];
     };
   };
 
