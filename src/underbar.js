@@ -323,7 +323,7 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-    var args = Array.prototype.slice.call(arguments).slice(2);
+    let args = Array.prototype.slice.call(arguments).slice(2);
     window.setTimeout(function(){
       func.apply(null, args);
     }, wait);
@@ -341,16 +341,14 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
-    var shuffled = array.slice();
+    let shuffled = array.slice();
 
     _.each(shuffled, function(item, i) {
       let j = i + Math.floor(Math.random() * (shuffled.length - i));
 
-      let item1 = shuffled[i];
-      let item2 = shuffled[j];
-
-      shuffled[i] = item2;
-      shuffled[j] = item1;
+      let temp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = temp;
     });
     return shuffled;
   };
@@ -368,7 +366,7 @@
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
     return _.map(collection, function(item) {
-      if (typeof functionOrKey === 'string' || functionOrKey instanceof String) {
+      if (typeof functionOrKey === 'string') {
         return item[functionOrKey].apply(item, args);
       } else {
         return functionOrKey.apply(item, args);
@@ -380,10 +378,10 @@
   // If iterator is a string, sort objects by that property with the name
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
-  _.sortBy = function(collection, iterator = _.identity) {
-    var originals = collection.slice();
-    var altered = _.map(originals, function(item) {
-      if(typeof(iterator) === 'string' || iterator instanceof String) {
+  _.sortBy = function(collection, iterator) {
+    let originals = collection.slice();
+    let altered = _.map(originals, function(item) {
+      if(typeof(iterator) === 'string') {
         return item[iterator];
       } else {
         return iterator(item);
@@ -395,15 +393,13 @@
 
         if (altered[j-1] > altered[j] || (altered[j-1] === undefined && altered[j] !== undefined)) {
 
-          let leftOrig = originals[j];
-          let rightOrig = originals[j-1];
-          originals[j-1] = leftOrig;
-          originals[j] = rightOrig;
+          let temp = originals[j];
+          originals[j] = originals[j - 1];
+          originals[j - 1] = temp;
 
-          let leftAlt = altered[j];
-          let rightAlt = altered[j-1];
-          altered[j-1] = leftAlt;
-          altered[j] = rightAlt;
+          temp = altered[j];
+          altered[j] = altered[j - 1];
+          altered[j - 1] = temp;
         }
       }
     }
@@ -417,14 +413,16 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
-    var args = Array.prototype.slice.call(arguments);
-    var lengths = _.map(args, function(item){ return item.length; });
-    var end = Math.max.apply(this,lengths);
+    let args = Array.prototype.slice.call(arguments);
+    let lengths = _.map(args, function(item){ return item.length; });
+    let end = Math.max.apply(null,lengths);
 
-    var results = [];
+    let results = [];
     for(let i = 0; i < end; i++) {
       let item = [];
-      _.each(args, function(arg) { item.push(arg[i]); });
+      _.each(args, function(arg) {
+        item.push(arg[i]);
+      });
       results.push(item);
     }
 
@@ -436,28 +434,29 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
-    if(Array.isArray(nestedArray)) {
-      var results = [];
-
-      _.each(nestedArray, function(item){
-        results = results.concat(_.flatten(item));
-      });
-
-      return results;
-    } else {
+    // base case
+    if (!Array.isArray(nestedArray)) {
       return nestedArray;
     }
+
+    // recursive case
+    let results = [];
+    _.each(nestedArray, function(item){
+      results = results.concat(_.flatten(item));
+    });
+
+    return results;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
-    var args = Array.prototype.slice.call(arguments);
+    let args = Array.prototype.slice.call(arguments);
 
-    var results = [];
+    let results = [];
 
     _.each(args[0], function(item) {
-      var inEveryArg = _.every(args, function(arr) {
+      let inEveryArg = _.every(args, function(arr) {
         return _.indexOf(arr, item) !== -1;
       });
       if(inEveryArg) results.push(item);
@@ -468,12 +467,11 @@
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var otherArrays = Array.prototype.slice.call(arguments).slice(1);
+    let otherArrays = Array.prototype.slice.call(arguments).slice(1);
 
-    var results = [];
-
+    let results = [];
     _.each(array, function(item) {
-      var inAnyOthers = _.some(otherArrays, function(arr) {
+      let inAnyOthers = _.some(otherArrays, function(arr) {
         return _.indexOf(arr, item) !== -1;
       });
       if(!inAnyOthers) results.push(item);
@@ -490,33 +488,31 @@
 
     var timestamp;
     var result;
-    var timeout;
+    var waitingForTimeout;
 
     return function() {
       var now = new Date();
-      // If at least ___ milliseconds have elapsed, apply the function
-      if (!timeout && (!timestamp || now > (timestamp + wait))) {
 
-        timestamp = now.getTime();
-        result = func.apply(null, arguments);
-        return result;
+      if (!waitingForTimeout) {
 
-      } else if (!timeout) {
-
-        timeout = true;
-        setTimeout(function() {
-          var time = new Date();
-          timestamp = time.getTime();
-          timeout = false;
-          result = func(arguments);
+        // If not enough time has elapsed, set a timeout to call func
+        if(timestamp && now < (timestamp + wait)) {
+          waitingForTimeout = true;
+          setTimeout(function() {
+            var time = new Date();
+            timestamp = time.getTime();
+            waitingForTimeout = false;
+            result = func(arguments);
+            return result;
+          }, wait);
+        } else { // Otherwise call the function now and set timestamp
+          timestamp = now.getTime();
+          result = func.apply(null, arguments);
           return result;
-        }, wait);
-
-      } else {
-
-        return result;
-
+        }
       }
+      // If still waiting on the timeout, return previous result
+      return result;
     }
   };
 
